@@ -85,7 +85,7 @@ python model_gen.py \
 
 ### Generalization of epidemiological models 
 
-Let N be the number of compartments in our epidemiological model. We epresent a huge variety of model by using an edge-adjacency matrix. Let A be a NxN size edge-adjacency matrix, we define it as the following: 
+Let *C* be the number of compartments in our epidemiological model. We represent a huge variety of model by using an edge-adjacency matrix. Let A be a *C* x *C* size edge-adjacency matrix, we define it as the following: 
 
 $$
 \mathrm{[A]}_{ij} = \begin{cases}
