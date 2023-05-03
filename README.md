@@ -31,7 +31,26 @@ pip install -r requirements.txt
 
 The following packages are needed and will get installed: 
 
-`pandas`, `numpy`, `lmfit`, `scipy`, `matplotlib`, `sklearn`, `gym` 
+`pandas`, `numpy`, `lmfit`, `scipy`, `matplotlib`, `scikit-learn`, `gym` 
+
+# Background 
+
+One of the simplest compartmental models is the SIR model (Suspected, Infected, Recovered) and it can be described as shown in the figure below: 
+
+![SIR model](readme_assets/sir.png) 
+
+Thus, we obtain the following equations with the parameters $\beta$ and $\gamma$ as transition rates: 
+
+$$
+\begin{cases}
+    \frac{dS}{dt} = -\frac{\beta I S}{N} \\ \\
+    \frac{dI}{dt} = \frac{\beta I S}{N} - \gamma I \\ \\
+    \frac{dR}{dt} = \gamma I 
+\end{cases}
+$$
+
+
+
 
 # Usage
 
@@ -48,7 +67,7 @@ The script takes the following four options:
 
 `--num_sim_days`: Specifies the desired number of days for simulation 
 
-`--save_data`: True or 1 for saving the data at the path mentioned in configuration json file. 
+`--save_data`: True or 1 for saving the data at the path mentioned in configuration json file 
 
 `--plot`: True or 1 for displaying the simulated curves for visulaization 
 
@@ -62,10 +81,36 @@ python model_gen.py \
 	--save_data 0 
 ```
 
+
+### Generalization of epidemiological models 
+
+Let N be the number of compartments in our epidemiological model. We epresent a huge variety of model by using an edge-adjacency matrix. Let A be a NxN size edge-adjacency matrix, we define it as the following: 
+
+$$
+\mathrm{[A]}_{ij} = \begin{cases}
+    1 & \text{if } \text{i and j are adjacent} \\ 
+    0 & \text{otherwise}
+\end{cases}
+$$
+
+
+For example, for simple SIR, the edge-adjacency matrix will look like this: 
+
+$$
+\begin{pmatrix}
+    0 & 1 & 0\\
+    0 & 0 & 1\\
+    0 & 0 & 0
+\end{pmatrix}
+$$
+
+This representation allows for a quick and fairly easy way to implement simple custom models. 
+
 ### The configuration file 
 
 
-In order to properly set up the calibration, you will need to modify the configuration `json` file in the `configs` folder. You can find the templates of below: 
+In order to properly set up the calibration, you will need to modify the configuration `json` file in the `configs` folder. Here is a general template: 
+
 
 A sample config json file: 
 ```
@@ -83,20 +128,29 @@ A sample config json file:
     "name_fic" : ""
 }
 ```
+
+
 The configuration file needs the following information: 
 
 * `guess`: is a matrix made of some estimation of the parameters to fit. 
+
 * `nb_comp`: represents the number of compartments within your model. 
+
 * `name_comp`: is a matrix made of the name of the compartments. Those names has to be the same as the header in the csv file. 
-* `cor_tab`: is the edge-adjacency matrix discussed earlier. It is needed only if not using a custom ODE.
+
+* `cor_tab`: is the edge-adjacency matrix discussed earlier. It is needed only if not using a custom ODE. (Details for custom ODE are discussed later in this document). 
+
 * `fittab`: is a matrix with 1 in the ith row if you want to fit with the ith compartment. It is useful if you want to fit a complex model without having all the data available.
+
 * `N`: represents the total population from the dataset 
+
 * `y0`: represents the initial vector of value at day 0, we decided to not extract it from the data since a high variance in the data may lead to a flawed initial vector. 
+
 * `name_fic`: is the name of the .csv file containing the data. It has to be stored in the calibration/data folder. 
 
 ## Adding noise 
 
-To add noise to the previously simulated data, you can simply use the `--noise_level` option in `model_gen.py` python script to the desired noise level. 
+To add noise to data, you can simply use the `--noise_level` option in `model_gen.py` python script to the desired noise level. 
 
 Example for adding noise to data and saving it: 
 
@@ -111,7 +165,7 @@ python model_gen.py \
 
 ## Considering Population subgroups 
 
-We used [Epipolicy](https://epipolicy.github.io/) for generating data for simulated epidemics considering population subgroups. Its documentation ([here](https://epipolicy.github.io/docs_and_tutorials)) has a detailed explanation of how to use it. The exact contact matrices that we used our age-based subgroups can be found in our [full report]() (chapter 4). 
+We used [Epipolicy](https://epipolicy.github.io/) for generating data for simulated epidemics considering population subgroups. Its documentation ([here](https://epipolicy.github.io/docs_and_tutorials)) has a detailed explanation of how to use it. The exact contact matrices that we used for our experiments on age-based subgroups can be found in our [full report]() (chapter 4). 
 
 The configuration json file used for Epipolicy can be found here as an example and for reference: `configs/epipolicy/SIR.json`. 
 
@@ -120,38 +174,81 @@ Corresponding generated sample data (3 age-based population subgroups) can be fo
 We also provide the sample data with added noise for reference: `sample_data/epipolicy/noisy/*` 
 
 
+## Calibration: Running optimization methods 
+
+Use the `optim_train.py` python script to train any / all optimization methods on your data.  
+
+The script takes the following four options: 
+
+
+`--model_name`: Specifies the name of the epidemic model, eg, SIR. 
+
+`--gen_data`: True if you want to generate a csv of the results. The results will have the following columns: `Model`, `Training_days`, `Method`, `Mae`, `mse`, `<followed by one column for predictions for each epidemic model parameter>`. 
+
+`--file_json`: Specifies the path to the input config file (required)
+
+`--method`: Specifies the optimization method you want to use. List of all options: `leastsq`, `differential_evolution`, `brute`, `basinhopping`, `ampgo`, `nelder`, `lbfgsb`, `powell`, `cg`, `bfgs`, `tnc`, `trust-constr`, `slsqp`, `shgo`, `dual_annealing`, `least_squares`. If not specified, the scipt will run for all methods. 
+
+`--save_dir`: Specifies path to directory to save results (csv and plots if option is selected)
+
+`--start`, `--end`, `--step`: Together, these options specify the number of days available for training. Using these options, you can run the optimization methods for numerous amounts of days --- from 'start' to 'end' with a step size of 'step'. Example: To generate all results for all optimization methods for the following amounts of days available for training: [5, 10, 15, 20, 25] can be done using `--start 5 --end 25 --step 5` 
+
+`--plot`: True if you want plot and save resulting graphs. The graphs plot the predicted curve superimposed over the real values and can be helpful for visualizing the errors in the predictions. 
+
+Example to run the script with above options: 
+
+```
+python optim_train.py \
+    --model_name SIR \
+    --gen_data 1 
+	--file_json configs/simple/config_SIR.json \
+	--numethodm_sim_days leastsq \
+	--save_dir results/ \
+	--start 5 
+	--end 25 
+	--step 5 
+	--plot 1  
+```
+
+
+## Calibration: Running our Reinforcement Learning Approach 
+
+We use Proximal Policy Optimization in our RL approach. It is implemented in `ppo.py` python script. You are welocme to use any other RL algorithm. 
+
+Example to run our RL script: 
+
+
+
+```
+python rl/rl.py
+```
+
+
 ## Simulating Epidemiological compartmental data for custom ODE 
 
-First you will need to create a calibModel(), if you want to use the edge-adjacency matrix, or a calibModelOde(), if you want to use a custom ODE:
+First you will need to create `calibModelOde()`, if you want to use a custom ODE:
 
 ```python
-from calibration import calibModel  
 from calibration import calibModelEdo  
   
-model = calibModel()
-model2 = calibModelOde()
+model = calibModelOde()
 ```
 
-You will then have to call the calib function from those model. It will return
-three values:  
+You will then have to call the calib function from those model. It will return three values:  
 
-* A minimizer result class (see [here](https://lmfit.github.io/lmfit-py/fitting.html#lmfit.minimizer.MinimizerResult) for more information)  
-* A matrix containing the values of all comportment during the periode of
-the data set producing the best fit.  
+* A minimizer result class (see [here](https://lmfit.github.io/lmfit-py/fitting.html#lmfit.minimizer.MinimizerResult) for more information) 
+
+* A matrix containing the values of all comportment during the periode of the data set producing the best fit.  
+
 * An array made of the parameters producing the best fit.  
 
-You can call the function in this way:  
+You can call the function in the following way:  
 
 ```python
-out, fitted_curve, fitted_parameters = model.calib("config_file_name.json")
+out, fitted_curve, fitted_parameters = model.calib("config_file_name.json", deriv)  
 ```
 
-If you want to use a custom Ode you will have to call it this way : 
-python
-```
-out, fitted_curve, fitted_parameters = model2.calib("config_file_name.json", deriv)  
-```
-With **deriv** being the name of you ODE function defined as such : 
+Here, **deriv** is your custom ODE function which needs to be defined as follows: 
 
 ```python
 def deriv(y, t, N, params):
@@ -163,22 +260,23 @@ def deriv(y, t, N, params):
    return dy
 ```
 
-The calib function also have differents parameters : 
+The `calib` function can now be used as follows: 
 
 ```python
-calib(name_json, deriv (if using the Ode model), set_gamma=False, params_out=False, graph_out=True, method=’leastsq’, max_nfev=1000)
+calib(name_json, deriv, set_gamma=False, params_out=False, graph_out=True, method=`leastsq`, max_nfev=1000)
 ```
 
 You can modify those parameters, given with their default values above:
+
 * `set_gamma` takes a Boolean. Sometimes you have access to newly infected data everyday. When set to True, this allows the user to manually set the recovery rate parameter to 1, basically telling the program to not expect continuity in the infected value over time, in order to still produce a fit. If false it will estimate this parameter.
-* `params_out` takes a Boolean. If true, it will output the parameters in a .txt file located in the calibration/out folder.
+
+* `params_out` takes a Boolean. If true, it will output the parameters in a `.txt` file located in the specified folder (`calibration/out` set for now).
+
 * `graph_out` takes a Boolean. If true, it will display a graph of the fit, allowing you to monitor its coherence.
-* `method` takes a string. It allows you to choose which method to use when calibrating the model. You can choose them from the methods.txt file
+
+* `method` takes a string. It allows you to choose which method to use when calibrating the model. List of all options: `leastsq`, `differential_evolution`, `brute`, `basinhopping`, `ampgo`, `nelder`, `lbfgsb`, `powell`, `cg`, `bfgs`, `tnc`, `trust-constr`, `least_squares`, `slsqp`, `shgo`, `dual_annealing`. 
+
 * `max_nfev` takes an integer. It allows you to set a maximum number of iterations for the calibration 
-
-## Calibration: Running optimization methods 
-
-## Calibration: Running our Reinforcement Learning Approach 
 
 # Contributing
 
@@ -192,6 +290,5 @@ We welcome contributions from the community! If you'd like to contribute to this
 
 Please make sure to follow our code style and formatting guidelines, and to write clear and concise commit messages. We also encourage you to add unit tests and documentation for any new features or changes.
 
-By contributing to this project, you agree to license your contributions under the same license as this project (see [License](#license) section for details).
+If you have any questions or feedback, please don't hesitate to open an issue or reach out to us directly (email: [ng2531@nyu.edu](mailto:ng2531@nyu.edu)). We appreciate your contributions and look forward to working with you! 
 
-If you have any questions or feedback, please don't hesitate to open an issue or reach out to us directly. We appreciate your contributions and look forward to working with you! 
