@@ -9,7 +9,6 @@ Full report: [Link]() coming soon!
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
-- [License](#license)
 
 # Overview
 
@@ -63,6 +62,38 @@ python model_gen.py \
 	--save_data 0 
 ```
 
+### The configuration file 
+
+
+In order to properly set up the calibration, you will need to modify the configuration `json` file in the `configs` folder. You can find the templates of below: 
+
+A sample config json file: 
+```
+{
+    "guess" : [],
+    "nb_comp" : 0,
+    "name_comp" : [],
+    "cor_tab" : [[],[]],
+    "name_params" : [],
+    "fit_tab" : [],
+
+    "N" : 0,
+    "y0" : [],
+
+    "name_fic" : ""
+}
+```
+The configuration file needs the following information: 
+
+* `guess`: is a matrix made of some estimation of the parameters to fit. 
+* `nb_comp`: represents the number of compartments within your model. 
+* `name_comp`: is a matrix made of the name of the compartments. Those names has to be the same as the header in the csv file. 
+* `cor_tab`: is the edge-adjacency matrix discussed earlier. It is needed only if not using a custom ODE.
+* `fittab`: is a matrix with 1 in the ith row if you want to fit with the ith compartment. It is useful if you want to fit a complex model without having all the data available.
+* `N`: represents the total population from the dataset 
+* `y0`: represents the initial vector of value at day 0, we decided to not extract it from the data since a high variance in the data may lead to a flawed initial vector. 
+* `name_fic`: is the name of the .csv file containing the data. It has to be stored in the calibration/data folder. 
+
 ## Adding noise 
 
 To add noise to the previously simulated data, you can simply use the `--noise_level` option in `model_gen.py` python script to the desired noise level. 
@@ -71,14 +102,23 @@ Example for adding noise to data and saving it:
 
 ```
 python model_gen.py \
-	--file_json configs/simple/config_SIR_noisy_level2.json \
-	--num_sim_days 175 \
+    --file_json configs/simple/config_SIR_noisy_level2.json \
+    --num_sim_days 175 \
     --noise_level 0 \
-	--plot 1 \
-	--save_data 0 
+    --plot 1 \
+    --save_data 0 
 ```
 
 ## Considering Population subgroups 
+
+We used [Epipolicy](https://epipolicy.github.io/) for generating data for simulated epidemics considering population subgroups. Its documentation ([here](https://epipolicy.github.io/docs_and_tutorials)) has a detailed explanation of how to use it. The exact contact matrices that we used our age-based subgroups can be found in our [full report]() (chapter 4). 
+
+The configuration json file used for Epipolicy can be found here as an example and for reference: `configs/epipolicy/SIR.json`. 
+
+Corresponding generated sample data (3 age-based population subgroups) can be found here: `sample_data/epipolicy/simple/*` 
+
+We also provide the sample data with added noise for reference: `sample_data/epipolicy/noisy/*` 
+
 
 ## Simulating Epidemiological compartmental data for custom ODE 
 
@@ -130,33 +170,15 @@ calib(name_json, deriv (if using the Ode model), set_gamma=False, params_out=Fal
 ```
 
 You can modify those parameters, given with their default values above:
-* **set_gamma** take a Boolean. Sometimes you have access to newly infected data everyday. When set to True, this allows the user to manually set the recovery rate parameter to 1, basically telling the program to not expect continuity in the infected value over time, in order to still produce a fit. If false it will estimate this parameter.
-* **params_out** take a Boolean. If true, it will output the parameters in a .txt file located in the calibration/out folder.
-* **graph_out** take a Boolean. If true, it will display a graph of the fit, allowing you to monitor its coherence.
-* **method** take a string. It allows you to choose which method to use when calibrating the model. You can choose them from the methods.txt file
-* **max_nfev** take an integer. It allows you to set a maximum number of iterations for the calibration 
+* `set_gamma` takes a Boolean. Sometimes you have access to newly infected data everyday. When set to True, this allows the user to manually set the recovery rate parameter to 1, basically telling the program to not expect continuity in the infected value over time, in order to still produce a fit. If false it will estimate this parameter.
+* `params_out` takes a Boolean. If true, it will output the parameters in a .txt file located in the calibration/out folder.
+* `graph_out` takes a Boolean. If true, it will display a graph of the fit, allowing you to monitor its coherence.
+* `method` takes a string. It allows you to choose which method to use when calibrating the model. You can choose them from the methods.txt file
+* `max_nfev` takes an integer. It allows you to set a maximum number of iterations for the calibration 
 
-A sample config json file: 
-```
-{
-    "guess" : [],
-    "nb_comp" : 0,
-    "name_comp" : [],
-    "cor_tab" : [[],[]],
-    "name_params" : [],
-    "fit_tab" : [],
-
-    "N" : 0,
-    "y0" : [],
-
-    "name_fic" : ""
-}
-```
 ## Calibration: Running optimization methods 
 
 ## Calibration: Running our Reinforcement Learning Approach 
-
-## Generating plots: Superimposing predicted over real data to visualize the error 
 
 # Contributing
 
