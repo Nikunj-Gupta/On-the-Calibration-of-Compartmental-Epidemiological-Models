@@ -1,0 +1,15 @@
+{
+    "guess" : [0.4, 0.001, 0.05, 0.005, 0.01], 
+    "nb_comp" : 5,
+    "name_comp" : ["Suspected", "Infected", "Recovered", "Vaccinated", "Death"],
+    "cor_tab" : [[0,1,0,1,0], [0,0,1,0,1], [0,0,0,0,0], [0,1,0,0,0], [0,0,0,0,0]],
+    "name_params" : ["Beta", "Gamma", "Delta", "alpha", "kappa"],
+    "fit_tab" : [1,1,1,1,1],
+
+    "N" : 3e8,
+    "y0" : [299999999, 1, 0, 0, 0],
+
+    "file_fic" : "sample_data/simple/data_SIRVD.csv", 
+
+    "true_params" : [0.25, 0.002, 0.1, 0.01, 0.02] 
+}
