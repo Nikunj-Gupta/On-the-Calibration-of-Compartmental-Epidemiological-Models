@@ -3,5 +3,5 @@ scipy
 matplotlib
 pandas
 lmfit
-sklearn
+scikit-learn
 gym
