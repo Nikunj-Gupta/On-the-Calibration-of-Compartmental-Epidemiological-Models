@@ -6,6 +6,7 @@ Full report: [Link]() coming soon!
 # Table of Contents
 
 - [Overview](#overview)
+- [Background](#background)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -13,6 +14,24 @@ Full report: [Link]() coming soon!
 # Overview
 
 In this study, we present an overview of calibrating strategies that can be employed, including several optimization methods and reinforcement learning (RL). We discuss the benefits and drawbacks of these methods and highlight relevant practical conclusions from our experiments. Optimization methods iteratively adjust the parameters of the model until the model output matches the available data, whereas RL uses trial and error to learn the optimal set of parameters by maximizing a reward signal. Finally, we  discuss how the calibration of parameters of epidemiological compartmental models is an emerging field that has the potential to improve the accuracy of disease modeling and public health decision-making. Further research is needed to validate the effectiveness and scalability of these approaches in different epidemiological contexts. 
+
+# Background 
+
+One of the simplest compartmental models is the SIR model (Suspected, Infected, Recovered) and it can be described as shown in the figure below: 
+
+![SIR model](readme_assets/sir.png) 
+
+Thus, we obtain the following equations with the parameters $\beta$ and $\gamma$ as transition rates: 
+
+$$
+\begin{cases}
+    \frac{dS}{dt} = -\frac{\beta I S}{N} \\ \\
+    \frac{dI}{dt} = \frac{\beta I S}{N} - \gamma I \\ \\
+    \frac{dR}{dt} = \gamma I 
+\end{cases}
+$$
+
+
 
 # Installation
 
@@ -32,24 +51,6 @@ pip install -r requirements.txt
 The following packages are needed and will get installed: 
 
 `pandas`, `numpy`, `lmfit`, `scipy`, `matplotlib`, `scikit-learn`, `gym` 
-
-# Background 
-
-One of the simplest compartmental models is the SIR model (Suspected, Infected, Recovered) and it can be described as shown in the figure below: 
-
-![SIR model](readme_assets/sir.png) 
-
-Thus, we obtain the following equations with the parameters $\beta$ and $\gamma$ as transition rates: 
-
-$$
-\begin{cases}
-    \frac{dS}{dt} = -\frac{\beta I S}{N} \\ \\
-    \frac{dI}{dt} = \frac{\beta I S}{N} - \gamma I \\ \\
-    \frac{dR}{dt} = \gamma I 
-\end{cases}
-$$
-
-
 
 
 # Usage
