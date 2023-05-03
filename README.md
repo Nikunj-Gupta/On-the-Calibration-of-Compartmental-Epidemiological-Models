@@ -201,14 +201,14 @@ Example to run the script with above options:
 ```
 python optim_train.py \
     --model_name SIR \
-    --gen_data 1 
-	--file_json configs/simple/config_SIR.json \
-	--numethodm_sim_days leastsq \
-	--save_dir results/ \
-	--start 5 
-	--end 25 
-	--step 5 
-	--plot 1  
+    --gen_data 1 \
+    --file_json configs/simple/config_SIR.json \
+    --numethodm_sim_days leastsq \
+    --save_dir results/ \
+    --start 5 \
+    --end 25 \
+    --step 5 \
+    --plot 1 
 ```
 
 
@@ -235,7 +235,7 @@ from calibration import calibModelEdo
 model = calibModelOde()
 ```
 
-You will then have to call the calib function from those model. It will return three values:  
+You will then have to call the `calib` function. It will return three values:  
 
 * A minimizer result class (see [here](https://lmfit.github.io/lmfit-py/fitting.html#lmfit.minimizer.MinimizerResult) for more information) 
 
@@ -261,13 +261,7 @@ def deriv(y, t, N, params):
    return dy
 ```
 
-The `calib` function can now be used as follows: 
-
-```python
-calib(name_json, deriv, set_gamma=False, params_out=False, graph_out=True, method=`leastsq`, max_nfev=1000)
-```
-
-You can modify those parameters, given with their default values above:
+Other options available in calib are: 
 
 * `set_gamma` takes a Boolean. Sometimes you have access to newly infected data everyday. When set to True, this allows the user to manually set the recovery rate parameter to 1, basically telling the program to not expect continuity in the infected value over time, in order to still produce a fit. If false it will estimate this parameter.
 
@@ -278,6 +272,12 @@ You can modify those parameters, given with their default values above:
 * `method` takes a string. It allows you to choose which method to use when calibrating the model. List of all options: `leastsq`, `differential_evolution`, `brute`, `basinhopping`, `ampgo`, `nelder`, `lbfgsb`, `powell`, `cg`, `bfgs`, `tnc`, `trust-constr`, `least_squares`, `slsqp`, `shgo`, `dual_annealing`. 
 
 * `max_nfev` takes an integer. It allows you to set a maximum number of iterations for the calibration 
+
+Example: 
+```python
+calib(name_json, deriv, set_gamma=False, params_out=False, graph_out=True, method=`leastsq`, max_nfev=1000)
+```
+
 
 # Contributing
 
