@@ -203,7 +203,7 @@ python optim_train.py \
     --model_name SIR \
     --gen_data 1 \
     --file_json configs/simple/config_SIR.json \
-    --numethodm_sim_days leastsq \
+    --method leastsq \
     --save_dir results/ \
     --start 5 \
     --end 25 \
