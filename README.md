@@ -296,15 +296,6 @@ If you have any questions or feedback, please don't hesitate to open an issue or
 
 ## Cite 
 ```
-@phdthesis{gupta2023calibration,
-  title={On the calibration of compartmental epidemiological models},
-  author={Gupta, Nikunj},
-  year={2023},
-  school={New York University Tandon School of Engineering}
-}
-```
-or 
-```
 @article{gupta2023calibration,
   title={On the calibration of compartmental epidemiological models},
   author={Gupta, Nikunj and Mai, Anh and Abouzied, Azza and Shasha, Dennis},
