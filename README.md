@@ -293,3 +293,22 @@ Please make sure to follow our code style and formatting guidelines, and to writ
 
 If you have any questions or feedback, please don't hesitate to open an issue or reach out to us directly (email: [ng2531@nyu.edu](mailto:ng2531@nyu.edu)). We appreciate your contributions and look forward to working with you! 
 
+
+## Cite 
+```
+@phdthesis{gupta2023calibration,
+  title={On the calibration of compartmental epidemiological models},
+  author={Gupta, Nikunj},
+  year={2023},
+  school={New York University Tandon School of Engineering}
+}
+```
+or 
+```
+@article{gupta2023calibration,
+  title={On the calibration of compartmental epidemiological models},
+  author={Gupta, Nikunj and Mai, Anh and Abouzied, Azza and Shasha, Dennis},
+  journal={arXiv preprint arXiv:2312.05456},
+  year={2023}
+}
+```
